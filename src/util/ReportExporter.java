@@ -105,8 +105,8 @@ public class ReportExporter {
     private static String escapeCsv(String value) {
         if (value == null) return "";
         // Wrap in quotes if value contains comma, quote, or newline
-        if (value.contains(",") || value.contains(""") || value.contains("\n"))
-            return "\"" + value.replace("\"", "\"\"\"") + "\"";
+        if (value.contains(",") || value.contains("\"") || value.contains("\n"))
+            return "\"" + value.replace("\"", "\"\"") + "\"";
         return value;
     }
  

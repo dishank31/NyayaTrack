@@ -43,3 +43,4 @@ public class CaseHistory {
         return String.format("History{caseId=%d, %s → %s, by=%d, at=%s}",
                 caseId, oldStatus, newStatus, updatedBy, updateTime);
     }
+}

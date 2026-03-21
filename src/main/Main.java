@@ -20,19 +20,14 @@ import java.time.LocalDate;
 public class Main {
  
     public static void main(String[] args) {
- 
+
         System.out.println("============================================");
         System.out.println("  Judicial Case Monitoring & Analysis Sys  ");
         System.out.println("============================================");
- 
-        // ── Option 1: Run console tests (no DB needed for OOP demo) ──────────
-        testOOP();
- 
-        // ── Option 2: Run with DB and services ───────────────────────────────
+
+        // testOOP();
         // testWithDatabase();
- 
-        // ── Option 3: Launch Swing GUI ────────────────────────────────────────
-        // SwingUtilities.invokeLater(LoginFrame::new);
+        SwingUtilities.invokeLater(LoginFrame::new);
     }
  
     // ── OOP DEMONSTRATION (no DB required) ────────────────────────────────────
