@@ -91,13 +91,13 @@ INSERT INTO users (username, password_hash, role, extra_info) VALUES
 ('admin1',  '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9',
     'Admin', NULL),
 ('judge_sharma',
-    '482c811da5d5b4bc6d497ffa98491e38dd56c82b97b19d194ca4f2264e36bedc',
+    '94358d5abe1d055c1ced4403bb0e397edf8c905b33e03b34ad1b1d3adf2d9cf4',
     'Judge', 'Criminal'),
 ('judge_patel',
-    '482c811da5d5b4bc6d497ffa98491e38dd56c82b97b19d194ca4f2264e36bedc',
+    '94358d5abe1d055c1ced4403bb0e397edf8c905b33e03b34ad1b1d3adf2d9cf4',
     'Judge', 'Civil'),
 ('clerk_raj',
-    '482c811da5d5b4bc6d497ffa98491e38dd56c82b97b19d194ca4f2264e36bedc',
+    'a3630b8b8f6c82d33b0695f77f915e69ed7b0c5214062f8b870219845e069d30',
     'Clerk', '1');
  
 -- Courts

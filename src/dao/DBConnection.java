@@ -14,7 +14,7 @@ public class DBConnection {
     private static final String URL      = "jdbc:mysql://localhost:3306/judicial_system_db"
                                          + "?useSSL=false&serverTimezone=UTC";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "Dishank@31";   // ← Change this
+    private static final String PASSWORD = "YOUR_PASSWORD_HERE";   // ← Change this
  
     private static Connection instance = null;
  
