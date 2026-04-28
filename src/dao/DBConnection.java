@@ -1,26 +1,27 @@
 package dao;
- 
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
- 
+
 /**
  * Singleton JDBC connection manager.
  * Provides a single shared connection to the MySQL database.
  */
 public class DBConnection {
- 
+
     // ── Database configuration — update before running ───────────────────────
-    private static final String URL      = "jdbc:mysql://localhost:3306/judicial_system_db"
-                                         + "?useSSL=false&serverTimezone=UTC";
+    private static final String URL = "jdbc:mysql://localhost:3306/judicial_system_db"
+            + "?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "YOUR_PASSWORD_HERE";   // ← Change this
- 
+    private static final String PASSWORD = "YOUR_DB_PASSWORD_HERE";   // ← Set your MySQL password here
+
     private static Connection instance = null;
- 
+
     /** Private constructor — prevents direct instantiation */
-    private DBConnection() {}
- 
+    private DBConnection() {
+    }
+
     /**
      * Returns the singleton Connection instance.
      * Creates a new connection if none exists or if the existing one is closed.
@@ -39,7 +40,7 @@ public class DBConnection {
         }
         return instance;
     }
- 
+
     /** Gracefully close the connection */
     public static void closeConnection() {
         try {

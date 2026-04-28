@@ -35,3 +35,6 @@ reports/
 
 # Ignore temp scripts
 scratch/
+
+# Ignore temp utility scripts
+src/util/ResetPassword.java

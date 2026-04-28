@@ -152,12 +152,18 @@ public class CaseDAO {
  
     // ── ANALYTICS: average resolution days ───────────────────────────────────
     public double getAvgResolutionDays() throws SQLException {
-        String sql = "SELECT AVG(DATEDIFF(resolution_date, filing_date)) "
-                   + "FROM cases WHERE resolution_date IS NOT NULL";
+        // Use COALESCE so resolved cases without a resolution_date still contribute
+        // (falling back to today's date). Only counts truly closed cases.
+        String sql = "SELECT AVG(DATEDIFF(COALESCE(resolution_date, CURDATE()), filing_date)) "
+                   + "FROM cases WHERE status IN ('Resolved', 'Dismissed')";
         try (Connection conn = DBConnection.getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
-            return rs.next() ? rs.getDouble(1) : 0.0;
+            if (rs.next()) {
+                double val = rs.getDouble(1);
+                return rs.wasNull() ? 0.0 : val;
+            }
+            return 0.0;
         }
     }
  

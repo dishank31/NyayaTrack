@@ -42,6 +42,7 @@ public class DashboardFrame extends JFrame {
     private static final String NAV_ANALYTICS  = "Analytics";
     private static final String NAV_USERS      = "Manage Users";
     private static final String NAV_LOGOUT     = "Logout";
+    private static final String NAV_DELETE_ACCT = "Delete Account";
 
     public DashboardFrame(User user) {
         super("Nyaya Track — " + user.getRole() + ": " + user.getUsername());
@@ -72,21 +73,21 @@ public class DashboardFrame extends JFrame {
         cardPanel.add(createDashboardHome(), NAV_DASHBOARD);
 
         switch (userRole) {
-            case "Admin" -> {
+            case "Admin":
                 cardPanel.add(new ViewCasesPanel(currentUser, caseService), NAV_VIEW_CASES);
                 cardPanel.add(new AddCasePanel(currentUser, caseService), NAV_ADD_CASE);
                 cardPanel.add(createAnalyticsPanel(), NAV_ANALYTICS);
                 cardPanel.add(createUserManagementPanel(), NAV_USERS);
-            }
-            case "Judge" -> {
+                break;
+            case "Judge":
                 cardPanel.add(new ViewCasesPanel(currentUser, caseService), NAV_MY_CASES);
                 cardPanel.add(createAnalyticsPanel(), NAV_ANALYTICS);
-            }
-            case "Clerk" -> {
+                break;
+            case "Clerk":
                 cardPanel.add(new ViewCasesPanel(currentUser, caseService), NAV_VIEW_CASES);
                 cardPanel.add(new AddCasePanel(currentUser, caseService), NAV_ADD_CASE);
                 cardPanel.add(createAnalyticsPanel(), NAV_ANALYTICS);
-            }
+                break;
         }
 
         rootPanel.add(sidebar,   BorderLayout.WEST);
@@ -135,7 +136,7 @@ public class DashboardFrame extends JFrame {
         brandPanel.setBorder(BorderFactory.createEmptyBorder(22, 20, 16, 20));
         brandPanel.setMaximumSize(new Dimension(UIConstants.SIDEBAR_WIDTH, 90));
 
-        JLabel brandName = new JLabel("⚖  Nyaya Track");
+        JLabel brandName = new JLabel("Nyaya Track");
         brandName.setFont(UIConstants.FONT_HEADING);
         brandName.setForeground(UIConstants.ACCENT_GOLD);
         brandName.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -153,32 +154,32 @@ public class DashboardFrame extends JFrame {
         sb.add(Box.createVerticalStrut(10));
 
         // ── ROLE-SPECIFIC navigation buttons ─────────────────────────────────
-        List<String[]> navItems = new ArrayList<>();
-        navItems.add(new String[]{NAV_DASHBOARD, "📊"});
+        List<String> navItems = new ArrayList<>();
+        navItems.add(NAV_DASHBOARD);
 
         switch (userRole) {
-            case "Admin" -> {
-                navItems.add(new String[]{NAV_VIEW_CASES, "📋"});
-                navItems.add(new String[]{NAV_ADD_CASE,   "➕"});
-                navItems.add(new String[]{NAV_ANALYTICS,  "📈"});
-                navItems.add(new String[]{NAV_USERS,      "👥"});
-            }
-            case "Judge" -> {
-                navItems.add(new String[]{NAV_MY_CASES,   "📋"});
-                navItems.add(new String[]{NAV_ANALYTICS,  "📈"});
-            }
-            case "Clerk" -> {
-                navItems.add(new String[]{NAV_VIEW_CASES, "📋"});
-                navItems.add(new String[]{NAV_ADD_CASE,   "➕"});
-                navItems.add(new String[]{NAV_ANALYTICS,  "📈"});
-            }
+            case "Admin":
+                navItems.add(NAV_VIEW_CASES);
+                navItems.add(NAV_ADD_CASE);
+                navItems.add(NAV_ANALYTICS);
+                navItems.add(NAV_USERS);
+                break;
+            case "Judge":
+                navItems.add(NAV_MY_CASES);
+                navItems.add(NAV_ANALYTICS);
+                break;
+            case "Clerk":
+                navItems.add(NAV_VIEW_CASES);
+                navItems.add(NAV_ADD_CASE);
+                navItems.add(NAV_ANALYTICS);
+                break;
         }
 
-        for (String[] item : navItems) {
-            JButton btn = createNavButton(item[1] + "  " + item[0], item[0]);
+        for (String item : navItems) {
+            JButton btn = createNavButton(item, item);
             sb.add(btn);
             sb.add(Box.createVerticalStrut(2));
-            if (item[0].equals(NAV_DASHBOARD)) {
+            if (item.equals(NAV_DASHBOARD)) {
                 activeNavButton = btn;
                 btn.setBackground(new Color(255, 255, 255, 15));
             }
@@ -198,18 +199,12 @@ public class DashboardFrame extends JFrame {
         userPanel.setBorder(BorderFactory.createEmptyBorder(12, 20, 12, 20));
         userPanel.setMaximumSize(new Dimension(UIConstants.SIDEBAR_WIDTH, 80));
 
-        String roleIcon = switch (userRole) {
-            case "Admin" -> "🛡️";
-            case "Judge" -> "⚖️";
-            case "Clerk" -> "📝";
-            default      -> "👤";
-        };
-        JLabel userIcon = new JLabel(roleIcon + " " + currentUser.getUsername());
+        JLabel userIcon = new JLabel(currentUser.getUsername());
         userIcon.setFont(UIConstants.FONT_BODY_BOLD);
         userIcon.setForeground(UIConstants.TEXT_ON_DARK);
         userIcon.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel roleLabel = new JLabel("     " + currentUser.getRole());
+        JLabel roleLabel = new JLabel(currentUser.getRole());
         roleLabel.setFont(UIConstants.FONT_SMALL);
         roleLabel.setForeground(UIConstants.TEXT_MUTED);
         roleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -219,9 +214,14 @@ public class DashboardFrame extends JFrame {
         userPanel.add(roleLabel);
         sb.add(userPanel);
 
-        JButton logoutBtn = createNavButton("🚪  " + NAV_LOGOUT, NAV_LOGOUT);
+        JButton logoutBtn = createNavButton(NAV_LOGOUT, NAV_LOGOUT);
         logoutBtn.setForeground(new Color(255, 120, 120));
         sb.add(logoutBtn);
+        sb.add(Box.createVerticalStrut(4));
+
+        JButton deleteBtn = createNavButton(NAV_DELETE_ACCT, NAV_DELETE_ACCT);
+        deleteBtn.setForeground(new Color(255, 80, 80));
+        sb.add(deleteBtn);
         sb.add(Box.createVerticalStrut(12));
 
         return sb;
@@ -229,12 +229,12 @@ public class DashboardFrame extends JFrame {
 
     /** Returns a role-specific subtitle for the sidebar brand area. */
     private String getRoleSubtitle() {
-        return switch (userRole) {
-            case "Admin" -> "System Administrator";
-            case "Judge" -> "Judicial Officer Panel";
-            case "Clerk" -> "Court Clerk Panel";
-            default      -> "Case Monitoring System";
-        };
+        switch (userRole) {
+            case "Admin": return "System Administrator";
+            case "Judge": return "Judicial Officer Panel";
+            case "Clerk": return "Court Clerk Panel";
+            default:      return "Case Monitoring System";
+        }
     }
 
     private JButton createNavButton(String label, String command) {
@@ -274,6 +274,29 @@ public class DashboardFrame extends JFrame {
                 ReportExporter.log("User logged out: " + currentUser.getUsername());
                 dispose();
                 new LoginFrame();
+            } else if (NAV_DELETE_ACCT.equals(command)) {
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "Are you sure you want to permanently delete your account?\n"
+                        + "Username: " + currentUser.getUsername() + "\n"
+                        + "Role: " + currentUser.getRole() + "\n\n"
+                        + "This action cannot be undone.",
+                        "Delete Account", JOptionPane.YES_NO_OPTION,
+                        JOptionPane.WARNING_MESSAGE);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    boolean deleted = new service.UserService().deleteUser(currentUser.getUserId());
+                    if (deleted) {
+                        ReportExporter.log("Account deleted: " + currentUser.getUsername());
+                        JOptionPane.showMessageDialog(this,
+                                "Your account has been deleted.",
+                                "Account Deleted", JOptionPane.INFORMATION_MESSAGE);
+                        dispose();
+                        new LoginFrame();
+                    } else {
+                        JOptionPane.showMessageDialog(this,
+                                "Failed to delete account. Please try again.",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
             } else {
                 if (activeNavButton != null) activeNavButton.repaint();
                 activeNavButton = btn;
@@ -303,12 +326,11 @@ public class DashboardFrame extends JFrame {
         header.setOpaque(false);
 
         // Role-specific title
-        String pageTitleText = switch (userRole) {
-            case "Admin" -> "Administration Dashboard — Full System Access";
-            case "Judge" -> "Judicial Officer Dashboard — " + getJudgeSpecialization();
-            case "Clerk" -> "Court Clerk Dashboard — Case Registration & Records";
-            default      -> "Judicial Case Monitoring Dashboard";
-        };
+        String pageTitleText = "Judicial Case Monitoring Dashboard";
+        if ("Admin".equals(userRole))      pageTitleText = "Administration Dashboard — Full System Access";
+        else if ("Judge".equals(userRole)) pageTitleText = "Judicial Officer Dashboard — " + getJudgeSpecialization();
+        else if ("Clerk".equals(userRole)) pageTitleText = "Court Clerk Dashboard — Case Registration & Records";
+
         JLabel pageTitle = new JLabel(pageTitleText);
         pageTitle.setFont(UIConstants.FONT_SUBHEADING);
         pageTitle.setForeground(UIConstants.PRIMARY_DARK);
@@ -316,7 +338,7 @@ public class DashboardFrame extends JFrame {
         JPanel rightInfo = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
         rightInfo.setOpaque(false);
 
-        JLabel dateLabel = new JLabel("📅 " + LocalDate.now().toString());
+        JLabel dateLabel = new JLabel(LocalDate.now().toString());
         dateLabel.setFont(UIConstants.FONT_SMALL);
         dateLabel.setForeground(UIConstants.TEXT_SECONDARY);
 
@@ -335,19 +357,20 @@ public class DashboardFrame extends JFrame {
 
     /** Extracts specialization from Judge model if available. */
     private String getJudgeSpecialization() {
-        if (currentUser instanceof model.Judge j) {
+        if (currentUser instanceof model.Judge) {
+            model.Judge j = (model.Judge) currentUser;
             return j.getSpecialization() + " Law";
         }
         return "General";
     }
 
     private JLabel createRoleBadge(String role) {
-        Color badgeColor = switch (role) {
-            case "Admin" -> UIConstants.ACCENT_GOLD;
-            case "Judge" -> UIConstants.PRIMARY_LIGHT;
-            case "Clerk" -> UIConstants.SUCCESS;
-            default      -> UIConstants.TEXT_SECONDARY;
-        };
+        Color bc = UIConstants.TEXT_SECONDARY;
+        if ("Admin".equals(role))      bc = UIConstants.ACCENT_GOLD;
+        else if ("Judge".equals(role)) bc = UIConstants.PRIMARY_LIGHT;
+        else if ("Clerk".equals(role)) bc = UIConstants.SUCCESS;
+
+        final Color badgeColor = bc;
 
         JLabel badge = new JLabel(role) {
             @Override protected void paintComponent(Graphics g) {
@@ -378,22 +401,20 @@ public class DashboardFrame extends JFrame {
         panel.setOpaque(false);
 
         // --- Welcome section with role-specific message ---
-        String welcomeMsg = switch (userRole) {
-            case "Admin" -> "Welcome, Administrator " + currentUser.getUsername() + " 🛡️";
-            case "Judge" -> "Welcome, Hon. " + currentUser.getUsername() + " ⚖️";
-            case "Clerk" -> "Welcome, " + currentUser.getUsername() + " 📝";
-            default      -> "Welcome back, " + currentUser.getUsername();
-        };
+        String welcomeMsg = "Welcome back, " + currentUser.getUsername();
+        if ("Admin".equals(userRole))      welcomeMsg = "Welcome, Administrator " + currentUser.getUsername();
+        else if ("Judge".equals(userRole)) welcomeMsg = "Welcome, Hon. " + currentUser.getUsername();
+        else if ("Clerk".equals(userRole)) welcomeMsg = "Welcome, " + currentUser.getUsername();
+
         JLabel heading = new JLabel(welcomeMsg);
         heading.setFont(UIConstants.FONT_TITLE);
         heading.setForeground(UIConstants.PRIMARY_DARK);
 
-        String subText = switch (userRole) {
-            case "Admin" -> "Full system overview — manage cases, users, and generate reports.";
-            case "Judge" -> "Your assigned cases and courtroom analytics.";
-            case "Clerk" -> "Register cases, manage records, and generate basic reports.";
-            default      -> "Here's your judicial system overview for today.";
-        };
+        String subText = "Here's your judicial system overview for today.";
+        if ("Admin".equals(userRole))      subText = "Full system overview — manage cases, users, and generate reports.";
+        else if ("Judge".equals(userRole)) subText = "Your assigned cases and courtroom analytics.";
+        else if ("Clerk".equals(userRole)) subText = "Register cases, manage records, and generate basic reports.";
+
         JLabel sub = new JLabel(subText);
         sub.setFont(UIConstants.FONT_BODY);
         sub.setForeground(UIConstants.TEXT_SECONDARY);
@@ -412,7 +433,7 @@ public class DashboardFrame extends JFrame {
 
         if ("Judge".equals(userRole)) {
             // Judge sees ONLY assigned cases
-            casesToShow = caseService.getPendingCases(); // filtered by judge in ViewCasesPanel
+            casesToShow = caseService.getPendingCases();
             // Try to get judge-specific data
             List<Case> allCases = caseService.getAllCases();
             int myTotal = 0, myPending = 0;
@@ -429,11 +450,11 @@ public class DashboardFrame extends JFrame {
             statsRow.setOpaque(false);
             statsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 140));
             statsRow.add(createStatCard("My Cases", String.valueOf(myTotal),
-                    UIConstants.PRIMARY_LIGHT, "📋"));
+                    UIConstants.PRIMARY_LIGHT));
             statsRow.add(createStatCard("Pending", String.valueOf(myPending),
-                    UIConstants.STATUS_PENDING, "⏳"));
+                    UIConstants.STATUS_PENDING));
             statsRow.add(createStatCard("Resolved", String.valueOf(myResolved),
-                    UIConstants.SUCCESS, "✅"));
+                    UIConstants.SUCCESS));
         } else {
             // Admin and Clerk see global stats
             int pending  = caseService.getTotalBacklog();
@@ -446,13 +467,13 @@ public class DashboardFrame extends JFrame {
             statsRow.setOpaque(false);
             statsRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 140));
             statsRow.add(createStatCard("Total Cases", String.valueOf(total),
-                    UIConstants.PRIMARY_LIGHT, "📁"));
+                    UIConstants.PRIMARY_LIGHT));
             statsRow.add(createStatCard("Pending", String.valueOf(pending),
-                    UIConstants.STATUS_PENDING, "⏳"));
+                    UIConstants.STATUS_PENDING));
             statsRow.add(createStatCard("Resolved", String.valueOf(resolved),
-                    UIConstants.SUCCESS, "✅"));
+                    UIConstants.SUCCESS));
             statsRow.add(createStatCard("Avg. Resolution", String.format("%.1f d", avg),
-                    UIConstants.INFO, "📊"));
+                    UIConstants.INFO));
         }
 
         // --- Charts row ---
@@ -495,33 +516,33 @@ public class DashboardFrame extends JFrame {
         quickActions.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
 
         switch (userRole) {
-            case "Admin" -> {
-                RoundedButton addBtn = RoundedButton.success("+ Register New Case");
-                addBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_ADD_CASE));
-                RoundedButton viewBtn = RoundedButton.primary("View All Cases");
-                viewBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_VIEW_CASES));
-                RoundedButton usersBtn = RoundedButton.accent("Manage Users");
-                usersBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_USERS));
-                quickActions.add(addBtn);
-                quickActions.add(viewBtn);
-                quickActions.add(usersBtn);
-            }
-            case "Judge" -> {
-                RoundedButton viewBtn = RoundedButton.primary("View My Assigned Cases");
-                viewBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_MY_CASES));
-                RoundedButton analyticsBtn = RoundedButton.accent("View Analytics");
-                analyticsBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_ANALYTICS));
-                quickActions.add(viewBtn);
-                quickActions.add(analyticsBtn);
-            }
-            case "Clerk" -> {
-                RoundedButton addBtn = RoundedButton.success("+ Register New Case");
-                addBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_ADD_CASE));
-                RoundedButton viewBtn = RoundedButton.primary("View Case Registry");
-                viewBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_VIEW_CASES));
-                quickActions.add(addBtn);
-                quickActions.add(viewBtn);
-            }
+            case "Admin":
+                RoundedButton aAddBtn = RoundedButton.success("+ Register New Case");
+                aAddBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_ADD_CASE));
+                RoundedButton aViewBtn = RoundedButton.primary("View All Cases");
+                aViewBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_VIEW_CASES));
+                RoundedButton aUsersBtn = RoundedButton.accent("Manage Users");
+                aUsersBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_USERS));
+                quickActions.add(aAddBtn);
+                quickActions.add(aViewBtn);
+                quickActions.add(aUsersBtn);
+                break;
+            case "Judge":
+                RoundedButton jViewBtn = RoundedButton.primary("View My Assigned Cases");
+                jViewBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_MY_CASES));
+                RoundedButton jAnalyticsBtn = RoundedButton.accent("View Analytics");
+                jAnalyticsBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_ANALYTICS));
+                quickActions.add(jViewBtn);
+                quickActions.add(jAnalyticsBtn);
+                break;
+            case "Clerk":
+                RoundedButton cAddBtn = RoundedButton.success("+ Register New Case");
+                cAddBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_ADD_CASE));
+                RoundedButton cViewBtn = RoundedButton.primary("View Case Registry");
+                cViewBtn.addActionListener(e -> cardLayout.show(cardPanel, NAV_VIEW_CASES));
+                quickActions.add(cAddBtn);
+                quickActions.add(cViewBtn);
+                break;
         }
 
         panel.add(topSection, BorderLayout.NORTH);
@@ -537,30 +558,28 @@ public class DashboardFrame extends JFrame {
     }
 
     private RoundedPanel createStatCard(String label, String value,
-                                        Color accentColor, String icon) {
+                                        Color accentColor) {
         RoundedPanel card = new RoundedPanel();
         card.setLayout(new BorderLayout(4, 4));
 
-        JLabel iconLabel = new JLabel(icon);
-        iconLabel.setFont(new Font(UIConstants.FONT_FAMILY, Font.PLAIN, 24));
         JLabel lblTitle = new JLabel(label);
-        lblTitle.setFont(UIConstants.FONT_SMALL);
+        lblTitle.setFont(UIConstants.FONT_SMALL_BOLD);
         lblTitle.setForeground(UIConstants.TEXT_SECONDARY);
 
         JPanel topRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         topRow.setOpaque(false);
-        topRow.add(iconLabel);
         topRow.add(lblTitle);
 
         JLabel valLabel = new JLabel(value);
         valLabel.setFont(UIConstants.FONT_STAT_VALUE);
         valLabel.setForeground(accentColor);
 
+        final Color barColor = accentColor;
         JPanel accentBar = new JPanel() {
             @Override protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 UIConstants.applyRenderingHints(g2);
-                g2.setColor(accentColor);
+                g2.setColor(barColor);
                 g2.fillRoundRect(0, 0, getWidth(), 4, 4, 4);
                 g2.dispose();
             }
@@ -582,7 +601,7 @@ public class DashboardFrame extends JFrame {
         panel.setOpaque(false);
 
         String headingText = "Judge".equals(userRole)
-                ? "📈 My Case Analytics" : "📈 Backlog Analytics & Reports";
+                ? "My Case Analytics" : "Backlog Analytics & Reports";
         JLabel heading = new JLabel(headingText);
         heading.setFont(UIConstants.FONT_HEADING);
         heading.setForeground(UIConstants.PRIMARY_DARK);
@@ -694,7 +713,7 @@ public class DashboardFrame extends JFrame {
         JPanel panel = new JPanel(new BorderLayout(16, 16));
         panel.setOpaque(false);
 
-        JLabel heading = new JLabel("👥 User Management");
+        JLabel heading = new JLabel("User Management");
         heading.setFont(UIConstants.FONT_HEADING);
         heading.setForeground(UIConstants.PRIMARY_DARK);
 
@@ -746,84 +765,65 @@ public class DashboardFrame extends JFrame {
         JScrollPane tableScroll = new JScrollPane(userTable);
         tableScroll.setBorder(BorderFactory.createLineBorder(UIConstants.BORDER_LIGHT));
 
-        // ── Add user form ────────────────────────────────────────────────────
-        RoundedPanel formCard = new RoundedPanel();
-        formCard.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 8));
-        formCard.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        // ── Action bar: Delete + Refresh ──────────────────────────────────
+        RoundedPanel actionBar = new RoundedPanel();
+        actionBar.setLayout(new FlowLayout(FlowLayout.LEFT, 12, 8));
 
-        JLabel addLabel = new JLabel("Add User: ");
-        addLabel.setFont(UIConstants.FONT_BODY_BOLD);
-        addLabel.setForeground(UIConstants.PRIMARY_DARK);
+        RoundedButton deleteUserBtn = RoundedButton.danger("Delete Selected User");
+        RoundedButton refreshUsrBtn = RoundedButton.ghost("Refresh");
 
-        JTextField nameInput = new JTextField(12);
-        nameInput.setFont(UIConstants.FONT_BODY);
-        nameInput.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(UIConstants.BORDER_MEDIUM),
-                BorderFactory.createEmptyBorder(6, 8, 6, 8)));
-
-        JTextField passInput = new JTextField(12);
-        passInput.setFont(UIConstants.FONT_BODY);
-        passInput.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(UIConstants.BORDER_MEDIUM),
-                BorderFactory.createEmptyBorder(6, 8, 6, 8)));
-
-        JComboBox<String> roleBox = new JComboBox<>(new String[]{"Admin", "Judge", "Clerk"});
-        roleBox.setFont(UIConstants.FONT_BODY);
-
-        JTextField extraInput = new JTextField(10);
-        extraInput.setFont(UIConstants.FONT_BODY);
-        extraInput.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(UIConstants.BORDER_MEDIUM),
-                BorderFactory.createEmptyBorder(6, 8, 6, 8)));
-
-        RoundedButton addUserBtn = RoundedButton.success("Add");
-        RoundedButton refreshBtn = RoundedButton.ghost("↻ Refresh");
-
-        addUserBtn.addActionListener(e -> {
-            String uname = nameInput.getText().trim();
-            String pass  = passInput.getText().trim();
-            String role  = (String) roleBox.getSelectedItem();
-            String extra = extraInput.getText().trim();
-
-            if (uname.isEmpty() || pass.isEmpty()) {
+        deleteUserBtn.addActionListener(e -> {
+            int row = userTable.getSelectedRow();
+            if (row < 0) {
                 JOptionPane.showMessageDialog(this,
-                        "Username and password are required.",
-                        "Validation Error", JOptionPane.WARNING_MESSAGE);
+                        "Please select a user from the table first.",
+                        "No Selection", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            int    selUserId  = Integer.parseInt(userModel.getValueAt(row, 0).toString());
+            String selUname   = userModel.getValueAt(row, 1).toString();
+            String selRole    = userModel.getValueAt(row, 2).toString();
+
+            // Prevent admin from deleting themselves
+            if (selUserId == currentUser.getUserId()) {
+                JOptionPane.showMessageDialog(this,
+                        "You cannot delete your own account from here.\nUse 'Delete Account' in the sidebar.",
+                        "Not Allowed", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            boolean ok = new service.UserService().registerUser(uname, pass, role,
-                    extra.isEmpty() ? null : extra);
-            if (ok) {
-                JOptionPane.showMessageDialog(this,
-                        "User '" + uname + "' registered as " + role + "!",
-                        "Success", JOptionPane.INFORMATION_MESSAGE);
-                nameInput.setText(""); passInput.setText(""); extraInput.setText("");
-                refreshUsers.run();
-            } else {
-                JOptionPane.showMessageDialog(this,
-                        "Registration failed. Username may already exist or password too short.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Permanently delete this user?\n\n"
+                    + "Username : " + selUname + "\n"
+                    + "Role     : " + selRole  + "\n"
+                    + "User ID  : " + selUserId + "\n\n"
+                    + "This action cannot be undone.",
+                    "Confirm Delete", JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                boolean ok = new service.UserService().deleteUser(selUserId);
+                if (ok) {
+                    JOptionPane.showMessageDialog(this,
+                            "User '" + selUname + "' deleted successfully.",
+                            "Deleted", JOptionPane.INFORMATION_MESSAGE);
+                    refreshUsers.run();
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                            "Failed to delete user. Please try again.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
-        refreshBtn.addActionListener(e -> refreshUsers.run());
+        refreshUsrBtn.addActionListener(e -> refreshUsers.run());
 
-        formCard.add(addLabel);
-        formCard.add(new JLabel("User:"));
-        formCard.add(nameInput);
-        formCard.add(new JLabel("Pass:"));
-        formCard.add(passInput);
-        formCard.add(new JLabel("Role:"));
-        formCard.add(roleBox);
-        formCard.add(new JLabel("Extra:"));
-        formCard.add(extraInput);
-        formCard.add(addUserBtn);
-        formCard.add(refreshBtn);
+        actionBar.add(deleteUserBtn);
+        actionBar.add(refreshUsrBtn);
 
         panel.add(heading,     BorderLayout.NORTH);
         panel.add(tableScroll, BorderLayout.CENTER);
-        panel.add(formCard,    BorderLayout.SOUTH);
+        panel.add(actionBar,   BorderLayout.SOUTH);
         return panel;
     }
 }

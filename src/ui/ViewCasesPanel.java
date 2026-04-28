@@ -46,12 +46,18 @@ public class ViewCasesPanel extends JPanel {
         JPanel topBar = new JPanel(new BorderLayout(12, 0));
         topBar.setOpaque(false);
 
-        String headingText = switch (currentUser.getRole()) {
-            case "Judge" -> "📋  My Assigned Cases";
-            case "Clerk" -> "📋  Case Registry — Records";
-            case "Admin" -> "📋  All Cases — Administrator View";
-            default      -> "📋  Case Registry";
-        };
+        String headingText = "Case Registry";
+        switch (currentUser.getRole()) {
+            case "Judge":
+                headingText = "My Assigned Cases";
+                break;
+            case "Clerk":
+                headingText = "Case Registry — Records";
+                break;
+            case "Admin":
+                headingText = "All Cases — Administrator View";
+                break;
+        }
         JLabel heading = new JLabel(headingText);
         heading.setFont(UIConstants.FONT_HEADING);
         heading.setForeground(UIConstants.PRIMARY_DARK);
@@ -73,7 +79,7 @@ public class ViewCasesPanel extends JPanel {
                     UIConstants.applyRenderingHints(gp);
                     gp.setColor(UIConstants.TEXT_MUTED);
                     gp.setFont(UIConstants.FONT_BODY);
-                    gp.drawString("🔍 Search cases...", getInsets().left + 2,
+                    gp.drawString("Search cases...", getInsets().left + 2,
                             getHeight() / 2 + 5);
                     gp.dispose();
                 }
@@ -212,19 +218,19 @@ public class ViewCasesPanel extends JPanel {
 
         // Show action buttons based on role
         switch (currentUser.getRole()) {
-            case "Admin" -> {
+            case "Admin":
                 bottomBar.add(updateBtn);
                 bottomBar.add(assignBtn);
                 bottomBar.add(deleteBtn);
-            }
-            case "Clerk" -> {
+                break;
+            case "Clerk":
                 bottomBar.add(updateBtn);
                 bottomBar.add(assignBtn);
-            }
-            case "Judge" -> {
+                break;
+            case "Judge":
                 // Judge can only update status of their assigned cases
                 bottomBar.add(updateBtn);
-            }
+                break;
         }
 
         add(topBar,      BorderLayout.NORTH);

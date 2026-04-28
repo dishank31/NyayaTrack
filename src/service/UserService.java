@@ -58,6 +58,42 @@ public class UserService {
         }
     }
  
+    /**
+     * Check if a username already exists in the database.
+     */
+    public boolean usernameExists(String username) {
+        try {
+            return userDAO.usernameExists(username);
+        } catch (java.sql.SQLException e) {
+            System.err.println("[Service] DB error checking username: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Register a new system user with detailed error messaging.
+     * Returns null on success, or an error message string on failure.
+     */
+    public String registerUserWithMessage(String username, String password,
+                                          String role, String extra) {
+        try {
+            if (username == null || username.length() < 3)
+                return "Username must be at least 3 characters.";
+            if (password == null || password.length() < 6)
+                return "Password must be at least 6 characters.";
+            if (!role.matches("Admin|Judge|Clerk"))
+                return "Invalid role: " + role;
+            if (usernameExists(username))
+                return "Username '" + username + "' is already taken.";
+
+            boolean success = userDAO.addUser(username, password, role, extra);
+            return success ? null : "Registration failed. Please try again.";
+        } catch (java.sql.SQLException e) {
+            System.err.println("[Service] DB error registering user: " + e.getMessage());
+            return "Database error: " + e.getMessage();
+        }
+    }
+
     /** Fetch all registered users (Admin use) */
     public List<String[]> getAllUsers() {
         try {
@@ -65,6 +101,25 @@ public class UserService {
         } catch (SQLException e) {
             System.err.println("[Service] Error fetching users: " + e.getMessage());
             return List.of();
+        }
+    }
+
+    /**
+     * Delete a user account by user ID.
+     * Returns true on success, false on failure.
+     */
+    public boolean deleteUser(int userId) {
+        try {
+            boolean deleted = userDAO.deleteUser(userId);
+            if (deleted) {
+                System.out.println("[Service] User ID " + userId + " deleted successfully.");
+            } else {
+                System.err.println("[Service] No user found with ID: " + userId);
+            }
+            return deleted;
+        } catch (SQLException e) {
+            System.err.println("[Service] DB error deleting user: " + e.getMessage());
+            return false;
         }
     }
 }

@@ -83,6 +83,21 @@ public class UserDAO {
         return users;
     }
  
+    // ── CHECK USERNAME EXISTS ─────────────────────────────────────────────────
+    /**
+     * Checks whether a username is already taken.
+     * Returns true if the username exists in the database.
+     */
+    public boolean usernameExists(String username) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            return rs.next() && rs.getInt(1) > 0;
+        }
+    }
+ 
     // ── DELETE ────────────────────────────────────────────────────────────────
     public boolean deleteUser(int userId) throws SQLException {
         String sql = "DELETE FROM users WHERE user_id = ?";
